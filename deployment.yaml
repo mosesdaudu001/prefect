@@ -3,3 +3,8 @@ deployments:
   entrypoint: orchestrate_1.py:main_flow
   work_pool:
     name: zoompool
+
+- name: taxi_s3_data
+  entrypoint: orchestrate_aws.py:main_flow_s3
+  work_pool:
+    name: zoompool
