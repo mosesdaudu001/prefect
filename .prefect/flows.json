@@ -1,3 +1,4 @@
 {
-  "main-flow": "orchestrate_1.py:main_flow"
+  "main-flow": "orchestrate_1.py:main_flow",
+  "main-flow-s3": "orchestrate_aws.py:main_flow_s3"
 }
