@@ -7,6 +7,8 @@ import mlflow
 import xgboost as xgb
 from prefect import task, flow
 from prefect_aws import S3Bucket
+from prefect.artifacts import create_markdown_artifact
+from datetime import date
 
 @task(retries=3, retry_delay_seconds=2)
 def read_data(filename: str) -> pd.DataFrame:
@@ -89,10 +91,27 @@ def train_best_model(X_train,X_val, y_train, y_val, dv):
         
         mlflow.xgboost.log_model(booster, artifact_path="models_mlflow")
         
+        markdown__rmse_report = f"""# RMSE Report
+
+        ## Summary
+
+        Duration Prediction 
+
+        ## RMSE XGBoost Model
+
+        | Region    | RMSE |
+        |:----------|-------:|
+        | {date.today()} | {rmse:.2f} |
+        """
+
+        create_markdown_artifact(
+            key="duration-model-report", markdown=markdown__rmse_report
+        )
+        
         return None
 
 @flow
-def main_flow(train_path = "data/green_tripdata_2022-01.parquet",
+def main_flow_s3(train_path = "data/green_tripdata_2022-01.parquet",
               val_path = "data/green_tripdata_2022-02.parquet"):
     
     """The main pipeline"""
@@ -111,4 +130,4 @@ def main_flow(train_path = "data/green_tripdata_2022-01.parquet",
     train_best_model(X_train,X_val, y_train, y_val, dv)
 
 if __name__ == "__main__":
-    main_flow()
+    main_flow_s3()
